@@ -36,7 +36,6 @@ def turn_left():  # Поворот влево
     list_a = [[cos_s, sin_s, 0], [-sin_s, cos_s, 0], [0, 0, 1]]
     turn_l = np.array(list_a)
     coordinates = coordinates.dot(turn_l)
-    print(coordinates)
 
 
 def turn_right():  # Поворот в право
@@ -46,7 +45,6 @@ def turn_right():  # Поворот в право
     list_a = [[cos_s, sin_s, 0], [-sin_s, cos_s, 0], [0, 0, 1]]
     turn_r = np.array(list_a)
     coordinates = coordinates.dot(turn_r)
-    print(coordinates)
 
 
 def scaling_plus():  # Масштабирование плюс
@@ -85,13 +83,15 @@ while running:
                 scaling_plus()
             if event.key == pygame.K_LEFT:
                 scaling_minus()
-    if pygame.key.get_pressed()[pygame.K_UP]:
+            if event.key == pygame.K_l:
+                turn_left()
+    if pygame.key.get_pressed()[pygame.K_UP]:  # При помощи данного метода, выполняем действия, пок акнопка зажата
         turn_left()
     if pygame.key.get_pressed()[pygame.K_DOWN]:
         turn_right()
     screen.fill((255, 255, 255))  # Заполняем экран одним цветом
-    pygame.draw.line(screen, (0, 0, 0), [10, 250], [490, 250], 2)
-    pygame.draw.line(screen, (0, 0, 0), [250, 10], [250, 490], 2)
+    pygame.draw.line(screen, (255, 0, 0), [10, 250], [490, 250], 2)
+    pygame.draw.line(screen, (255, 0, 0), [250, 10], [250, 490], 2)
     pygame.draw.line(screen, (0, 0, 0), (250 + coordinates[0][0], 250 - coordinates[0][1]),
                      (250 + coordinates[1][0], 250 - coordinates[1][1]), 2)
     pygame.display.flip()  # Переворачиваем экран, при использовании двойной буферезаци

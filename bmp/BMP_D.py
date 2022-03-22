@@ -24,7 +24,7 @@ def create_bmp(width: int, height: int, f_name: str):
                     f.write(b"\x0f\x0f\x0f\x0f")
                 else:
                     f.write(b"\xf0\xf0\xf0\xf0")
-.
+
 
 if __name__ == "__main__":
     x = int(input("Введите количество столбцов: "))

@@ -38,7 +38,6 @@ def turn_left():  # Поворот влево
     list_a = [[cos_s, sin_s, 0], [-sin_s, cos_s, 0], [0, 0, 1]]
     turn_l = np.array(list_a)
     coordinates = coordinates.dot(turn_l)
-    print(coordinates)
 
 
 def turn_right():  # Поворот в право
@@ -48,7 +47,6 @@ def turn_right():  # Поворот в право
     list_a = [[cos_s, sin_s, 0], [-sin_s, cos_s, 0], [0, 0, 1]]
     turn_r = np.array(list_a)
     coordinates = coordinates.dot(turn_r)
-    print(coordinates)
 
 
 def scaling_plus():  # Масштабирование плюс
