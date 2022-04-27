@@ -15,7 +15,7 @@ coordinates = np.array([[50, 50, 1], [100, 100, 1]])
 
 def central():  # Отображение по центру
     global coordinates
-    central_sim = np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]])
+    central_sim = np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
     coordinates = coordinates.dot(central_sim)
 
 
