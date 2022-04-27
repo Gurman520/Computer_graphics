@@ -1,26 +1,34 @@
-import pygame as pg
+import pygame
 import numpy as np
-from pygame.locals import *
 
-from OpenGL.GL import *
-from OpenGL.GLU import *
-
-cubeVertices = (
-    (1, 1, 1, 1), (1, 1, -1, 1), (1, -1, -1, 1), (1, -1, 1, 1), (-1, 1, 1, 1), (-1, -1, -1, 1), (-1, -1, 1, 1),
-    (-1, 1, -1, 1))  # Определяет каждую вершину куба
-cubeEdges = ((0, 1), (0, 3), (0, 4), (1, 2), (1, 7), (2, 5), (2, 3), (3, 6), (4, 6), (4, 7), (5, 6),
-             (5, 7))  # Определяет вершины, которые необходимо соединить
+cubeVertices = np.array(
+    [[0, 80, 80, 1], [0, 0, 80, 1], [80, 0, 80, 1], [80, 80, 80, 1], [0, 80, 0, 1], [0, 0, 0, 1], [80, 0, 0, 1],
+     [80, 80, 0, 1]])  # Определяет каждую вершину куба
+cubeEdges = ((0, 1), (0, 3), (0, 4), (1, 2), (1, 5), (2, 3), (2, 6), (3, 7), (4, 5), (4, 7), (5, 6),
+             (6, 7))  # Определяет вершины, которые необходимо соединить
 
 
-# Функция рисования куба
-def wireCube():
-    # GL_LINES – это макрос, который указывает, что мы будем рисовать линии.
-    glBegin(GL_LINES)  # Говорим OpenGl что дальше будет исполняемый код для него
+def vid(x, y, z):
+    r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+    fi = np.arctan(y / x)
+    tet = np.arccos(z / np.sqrt(x ** 2 + y ** 2 + z ** 2))
+    cdvig = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [-x, -y, -z, 1]])
+    cos_al = (np.pi / 2) - fi
+    sin_al = (np.pi / 2) - fi
+    list_z = np.array([[cos_al, sin_al, 0, 0], [-sin_al, cos_al, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+    cos_s = np.cos(np.pi - tet)
+    sin_s = np.sin(np.pi - tet)
+    list_x = np.array([[1, 0, 0, 0], [0, cos_s, sin_s, 0], [0, -sin_s, cos_s, 0], [0, 0, 0, 1]])
+    m_x = np.array([[-1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+    return cdvig.dot(list_z.dot(list_x.dot(m_x)))
+
+
+def cube(vidov, screen):
+    global cubeVertices
+    matrix = cubeVertices.dot(vidov)
     for cubeEdge in cubeEdges:
-        for cubeVertex in cubeEdge:
-            glVertex4fv(cubeVertices[cubeVertex])
-            # функция, определяющая вершину с помощью 3 координат типа GLfloat , которые помещаются внутри вектора (кортежа)
-    glEnd()  # Закончили рисовать
+        pygame.draw.line(screen, (0, 0, 0), (250 + matrix[cubeEdge[0]][0], 250 - matrix[cubeEdge[0]][1]),
+                         (250 + matrix[cubeEdge[1]][0], 250 - matrix[cubeEdge[1]][1]), 2)
 
 
 def rotation_right_x():
@@ -28,7 +36,7 @@ def rotation_right_x():
     cos_s = np.cos(np.pi / 180)
     sin_s = np.sin(np.pi / 180)
     list_a = [[1, 0, 0, 0], [0, cos_s, -sin_s, 0], [0, sin_s, cos_s, 0], [0, 0, 0, 1]]
-    cubeVertices = list(np.array(cubeVertices).dot(list_a))
+    cubeVertices = cubeVertices.dot(list_a)
 
 
 def rotation_left_x():
@@ -36,7 +44,7 @@ def rotation_left_x():
     cos_s = np.cos(-np.pi / 180)
     sin_s = np.sin(-np.pi / 180)
     list_a = [[1, 0, 0, 0], [0, cos_s, -sin_s, 0], [0, sin_s, cos_s, 0], [0, 0, 0, 1]]
-    cubeVertices = list(np.array(cubeVertices).dot(list_a))
+    cubeVertices = cubeVertices.dot(list_a)
 
 
 def rotation_right_y():
@@ -44,7 +52,7 @@ def rotation_right_y():
     cos_s = np.cos(np.pi / 180)
     sin_s = np.sin(np.pi / 180)
     list_a = [[cos_s, 0, sin_s, 0], [0, 1, 0, 0], [-sin_s, 0, cos_s, 0], [0, 0, 0, 1]]
-    cubeVertices = list(np.array(cubeVertices).dot(list_a))
+    cubeVertices = cubeVertices.dot(list_a)
 
 
 def rotation_left_y():
@@ -52,15 +60,15 @@ def rotation_left_y():
     cos_s = np.cos(-np.pi / 180)
     sin_s = np.sin(-np.pi / 180)
     list_a = [[cos_s, 0, sin_s, 0], [0, 1, 0, 0], [-sin_s, 0, cos_s, 0], [0, 0, 0, 1]]
-    cubeVertices = list(np.array(cubeVertices).dot(list_a))
+    cubeVertices = cubeVertices.dot(list_a)
 
 
 def rotation_right_z():
     global cubeVertices
     cos_s = np.cos(np.pi / 180)
     sin_s = np.sin(np.pi / 180)
-    list_a = [[cos_s, -sin_s, 0, 0], [sin_s, cos_s, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
-    cubeVertices = list(np.array(cubeVertices).dot(list_a))
+    list_a = np.array([[cos_s, -sin_s, 0, 0], [sin_s, cos_s, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+    cubeVertices = cubeVertices.dot(list_a)
 
 
 def rotation_left_z():
@@ -68,39 +76,34 @@ def rotation_left_z():
     cos_s = np.cos(-np.pi / 180)
     sin_s = np.sin(-np.pi / 180)
     list_a = [[cos_s, -sin_s, 0, 0], [sin_s, cos_s, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
-    cubeVertices = list(np.array(cubeVertices).dot(list_a))
+    cubeVertices = cubeVertices.dot(list_a)
 
 
 def main():
-    pg.init()
-    display = (500, 500)  # Размер окна
-    pg.display.set_mode(display, DOUBLEBUF | OPENGL)  # функция, которая очищает указанные буферы
-
-    gluPerspective(45, (display[0] / display[1]), 0.1, 50.0)
-
-    glTranslatef(0.0, 0.0, -5)
-
+    pygame.init()
+    screen = pygame.display.set_mode((500, 500))  # Устанавливаем размер экрана
+    pygame.display.set_caption("Кубик")  # Задаём имя для окна
+    vidov_matrix = vid(10, 10, 10)
     while True:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
                 quit()
-        if pg.key.get_pressed()[pg.K_RIGHT]:
-            rotation_right_z()
-        if pg.key.get_pressed()[pg.K_LEFT]:
+        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+            rotation_right_z()  # Поворот по Оси Z
+        if pygame.key.get_pressed()[pygame.K_LEFT]:
             rotation_left_z()
-        if pg.key.get_pressed()[pg.K_UP]:
-            rotation_right_y()
-        if pg.key.get_pressed()[pg.K_DOWN]:
+        if pygame.key.get_pressed()[pygame.K_UP]:
+            rotation_right_y()  # Поворот по Оси Y
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
             rotation_left_y()
-        if pg.key.get_pressed()[pg.K_w]:
-            rotation_right_x()
-        if pg.key.get_pressed()[pg.K_s]:
+        if pygame.key.get_pressed()[pygame.K_w]:
+            rotation_right_x()  # Поворот по Оси X
+        if pygame.key.get_pressed()[pygame.K_s]:
             rotation_left_x()
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        wireCube()
-        pg.display.flip()
+        screen.fill((255, 255, 255))
+        cube(vidov_matrix, screen)
+        pygame.display.flip()
 
 
 if __name__ == "__main__":
